@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saromé - Luxury Perfumes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #800020;
+            color: #fff;
+        }
+        
+        .heading-font {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cart-item {
+            transition: all 0.3s ease;
+        }
+        
+        .cart-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #fff;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        
+        .page-transition {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .mobile-menu.open {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-90 text-white sticky top-0 z-50 shadow-lg backdrop-blur-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-1">
+                    <a href="#" class="text-2xl font-bold heading-font tracking-wider" onclick="showPage('home')">SAROMÉ</a>
+                    <span class="text-xs text-gray-400 hidden md:block">LUXURY PERFUMES</span>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="nav-link px-3 py-2" onclick="showPage('home')">Home</a>
+                    <a href="#" class="nav-link px-3 py-2" onclick="showPage('products')">Perfumes</a>
+                    <a href="#" class="nav-link px-3 py-2" onclick="showPage('about')">Our Story</a>
+                    <button onclick="toggleCart()" class="relative px-3 py-2">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span id="cart-count" class="absolute -top-1 -right-1 bg-white text-black rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
+                    </button>
+                </div>
+                
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-white focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="mobile-menu" class="mobile-menu md:hidden bg-black bg-opacity-90 mt-2 rounded-lg">
+                <div class="flex flex-col space-y-2 p-4">
+                    <a href="#" class="nav-link py-2" onclick="showPage('home'); toggleMobileMenu()">Home</a>
+                    <a href="#" class="nav-link py-2" onclick="showPage('products'); toggleMobileMenu()">Perfumes</a>
+                    <a href="#" class="nav-link py-2" onclick="showPage('about'); toggleMobileMenu()">Our Story</a>
+                    <button onclick="toggleCart()" class="relative py-2 text-left flex items-center">
+                        <i class="fas fa-shopping-bag mr-2"></i>
+                        Shopping Bag
+                        <span id="mobile-cart-count" class="ml-auto bg-white text-black rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Shopping Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full md:w-96 bg-black bg-opacity-90 text-white transform translate-x-full transition-transform duration-300 z-40 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold heading-font">Your Bag</h2>
+                <button onclick="toggleCart()" class="text-2xl">&times;</button>
+            </div>
+            
+            <div id="cart-items" class="space-y-4">
+                <!-- Cart items will be added here dynamically -->
+                <p class="text-center py-10">Your bag is empty</p>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-6 pt-4">
+                <div class="flex justify-between mb-2">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal">$0.00</span>
+                </div>
+                <div class="flex justify-between mb-4">
+                    <span>Shipping</span>
+                    <span>Free</span>
+                </div>
+                <div class="flex justify-between text-xl font-bold">
+                    <span>Total</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+                
+                <button class="w-full bg-white text-black py-3 mt-6 font-bold hover:bg-gray-200 transition">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay for cart -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden" onclick="toggleCart()"></div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Home Page -->
+        <div id="home-page" class="page-transition">
+            <section class="relative h-[90vh] flex items-center justify-center bg-cover bg-center" style="background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1615634262417-94c4e34a63c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');">
+                <div class="text-center px-4">
+                    <h1 class="text-5xl md:text-7xl font-bold heading-font mb-6 tracking-tight">SAROMÉ</h1>
+                    <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-gray-100">Luxury perfumes crafted with passion, designed to evoke emotion and create lasting memories.</p>
+                    <button onclick="showPage('products')" class="bg-white text-black px-8 py-3 font-bold hover:bg-gray-200 transition duration-300 transform hover:scale-105">
+                        Discover Our Scents <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+                <div class="absolute bottom-8 left-0 right-0 flex justify-center">
+                    <a href="#signature-collection" class="text-white animate-bounce">
+                        <i class="fas fa-chevron-down text-2xl"></i>
+                    </a>
+                </div>
+            </section>
+            
+            <section class="py-16">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold heading-font mb-4">Our Signature Collection</h2>
+                    <p class="max-w-2xl mx-auto">Experience our most beloved fragrances that have captivated customers worldwide.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition-all duration-300 cursor-pointer hover:bg-opacity-70 group" onclick="showProductDetails('Noir', 'A deep, mysterious blend of oud, vanilla, and amber', 120)">
+                        <div class="h-64 bg-gradient-to-b from-gray-900 to-gray-800 mb-4 flex items-center justify-center rounded-t-lg overflow-hidden">
+                            <i class="fas fa-wine-bottle text-6xl text-gray-500 group-hover:text-gray-300 transition"></i>
+                        </div>
+                        <h3 class="text-xl font-bold heading-font mb-2">Noir</h3>
+                        <p class="text-gray-300 mb-4 text-sm">Mysterious • Seductive • Powerful</p>
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold">$120.00</p>
+                            <button class="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-black px-3 py-1 text-xs font-bold hover:bg-gray-200">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition cursor-pointer" onclick="showProductDetails('Blanc', 'A fresh, clean scent with notes of citrus and white flowers', 95)">
+                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
+                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold heading-font mb-2">Blanc</h3>
+                        <p class="text-gray-300 mb-4">Fresh • Clean • Elegant</p>
+                        <p class="font-bold">$95.00</p>
+                    </div>
+                    
+                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition cursor-pointer" onclick="showProductDetails('Rouge', 'A passionate blend of rose, saffron, and warm spices', 110)">
+                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
+                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold heading-font mb-2">Rouge</h3>
+                        <p class="text-gray-300 mb-4">Passionate • Warm • Romantic</p>
+                        <p class="font-bold">$110.00</p>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-12">
+                    <button onclick="showPage('products')" class="border border-white px-8 py-3 font-bold hover:bg-white hover:text-black transition">View All Perfumes</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Products Page -->
+        <div id="products-page" class="page-transition hidden">
+            <section class="py-8">
+                <h1 class="text-3xl md:text-4xl font-bold heading-font mb-6">Our Perfumes</h1>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Product 1 -->
+                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
+                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
+                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold heading-font mb-2">Noir</h3>
+                        <p class="text-gray-300 mb-4">A deep, mysterious blend of oud, vanilla, and amber</p>
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold">$120.00</p>
+                            <button onclick="addToCart('Noir', 120)" class="bg-white text-black px-4 py-2 text-sm font-bold hover:bg-gray-200 transition">Add to Bag</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 2 -->
+                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
+                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
+                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold heading-font mb-2">Blanc</h3>
+                        <p class="text-gray-300 mb-4">A fresh, clean scent with notes of citrus and white flowers</p>
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold">$95.00</p>
+                            <button onclick="addToCart('Blanc', 95)" class="bg-white text-black px-4 py-2 text-sm font-bold hover:bg-gray-200 transition">Add to Bag</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 3 -->
+                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
+                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
+                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold heading-font mb-2">Rouge</h3>
+                        <p class="text-gray-300 mb-4">A passionate blend of rose, saffron, and warm spices</p>
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold">$110.00</p>
+                            <button onclick="addToCart('Rouge', 110)" class="bg-white text-black px-4 py-2 text-sm font-bold hover:bg-gray-200 transition">Add to Bag</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 4 -->
+                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
+                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
+                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold heading-font mb-2">Lune</h3>
+                        <p class="text-gray-300 mb-4">A nocturnal fragrance with jasmine, sandalwood, and musk</p>
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold">$105.00</p>
+                            <button onclick="addToCart('Lune', 105)" class="bg-white text-black px-4 py-2 text-sm font-bold hover:bg-gray-200 transition">Add to Bag</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 5 -->
+                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
+                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
+                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold heading-font mb-2">Soleil</h3>
+                        <p class="text-gray-300 mb-4">A sunny, vibrant scent with bergamot, neroli, and amber</p>
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold">$100.00</p>
+                            <button onclick="addToCart('Soleil', 100)" class="bg-white text-black px-4 py-2 text-sm font-bold hover:bg-gray-200 transition">Add to Bag</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 6 -->
+                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
+                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
+                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold heading-font mb-2">Éclat</h3>
+                        <p class="text-gray-300 mb-4">A sparkling fragrance with pear, peony, and cedarwood</p>
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold">$115.00</p>
+                            <button onclick="addToCart('Éclat', 115)" class="bg-white text-black px-4 py-2 text-sm font-bold hover:bg-gray-200 transition">Add to Bag</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- About Page -->
+        <div id="about-page" class="page-transition hidden">
+            <section class="py-8">
+                <div class="flex flex-col md:flex-row items-center mb-12">
+                    <div class="md:w-1/2 mb-8 md:mb-0 md:pr-8">
+                        <h1 class="text-3xl md:text-4xl font-bold heading-font mb-6">Our Story</h1>
+                        <p class="mb-4">Sarah Salahia's journey with Saromé began with love and curiosity. What started small, as a personal exploration of scents and emotions, blossomed into a passion for bottling feelings into fragrances.</p>
+                        <p class="mb-4">"I created Saromé to share my vision of perfumery as an art form. Each scent is carefully composed like a symphony, with top notes that greet you, heart notes that reveal the character, and base notes that linger in memory."</p>
+                        <p>Today, Saromé perfumes are cherished by those who seek more than just a scent - they seek a bottled emotion, a memory, a moment captured in fragrance.</p>
+                    </div>
+                    <div class="md:w-1/2">
+                        <div class="h-96 bg-gray-800 bg-opacity-50 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-store text-6xl text-gray-600"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row-reverse items-center mb-12">
+                    <div class="md:w-1/2 mb-8 md:mb-0 md:pl-8">
+                        <h2 class="text-2xl md:text-3xl font-bold heading-font mb-6">Our Philosophy</h2>
+                        <p class="mb-4">At Saromé, we believe that a fragrance should be more than just a pleasant scent—it should be an experience, a memory, a statement.</p>
+                        <p class="mb-4">We use only the finest ingredients sourced from ethical suppliers around the world. Each perfume is crafted in small batches to ensure quality and attention to detail.</p>
+                        <p>Our perfumes are designed to evolve with you throughout the day, revealing different notes as time passes, just like a beautiful story unfolding.</p>
+                    </div>
+                    <div class="md:w-1/2">
+                        <div class="h-96 bg-gray-800 bg-opacity-50 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-mortar-pestle text-6xl text-gray-600"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-black bg-opacity-50 p-8 rounded-lg">
+                    <h2 class="text-2xl md:text-3xl font-bold heading-font mb-6 text-center">Meet the Founder</h2>
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/3 mb-6 md:mb-0 flex justify-center">
+                            <div class="w-48 h-48 bg-gray-800 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-6xl text-gray-600"></i>
+                            </div>
+                        </div>
+                        <div class="md:w-2/3 md:pl-8">
+                            <h3 class="text-xl font-bold heading-font mb-2">Sarah Salahia</h3>
+                            <p class="text-gray-300 mb-4">Founder & Perfume Creator</p>
+                            <p class="mb-4">"I started small, with love and curiosity. Now, I bottle feelings into fragrances. Each Saromé scent is a journey - from the first spark of inspiration to the final blend that captures an emotion perfectly."</p>
+                            <p>Sarah's approach to perfumery comes from the heart, blending techniques with personal intuition. Each fragrance tells a story, evokes a memory, or captures a feeling - because to Sarah, perfume is emotion made tangible.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Product Details Modal -->
+        <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center hidden">
+            <div class="bg-black bg-opacity-90 text-white p-8 rounded-lg max-w-2xl w-full mx-4 relative">
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 text-2xl">&times;</button>
+                
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-1/2 mb-6 md:mb-0 md:pr-6">
+                        <div class="h-64 bg-gray-800 flex items-center justify-center">
+                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2">
+                        <h2 id="modal-product-name" class="text-2xl font-bold heading-font mb-2">Product Name</h2>
+                        <p id="modal-product-desc" class="text-gray-300 mb-4">Product description goes here</p>
+                        <p id="modal-product-price" class="text-xl font-bold mb-6">$0.00</p>
+                        
+                        <div class="flex items-center mb-6">
+                            <button onclick="decrementQuantity()" class="bg-gray-700 w-10 h-10 flex items-center justify-center">-</button>
+                            <span id="product-quantity" class="mx-4">1</span>
+                            <button onclick="incrementQuantity()" class="bg-gray-700 w-10 h-10 flex items-center justify-center">+</button>
+                        </div>
+                        
+                        <button onclick="addModalProductToCart()" class="w-full bg-white text-black py-3 font-bold hover:bg-gray-200 transition">Add to Bag</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-90 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold heading-font mb-4">Saromé</h3>
+                    <p>Luxury perfumes crafted with passion in Mersin, Türkiye. Online store delivering worldwide.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Shop</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:underline" onclick="showPage('products')">All Perfumes</a></li>
+                        <li><a href="#" class="hover:underline" onclick="showPage('products')">Best Sellers</a></li>
+                        <li><a href="#" class="hover:underline" onclick="showPage('products')">New Arrivals</a></li>
+                        <li><a href="#" class="hover:underline" onclick="toggleCart()">Your Cart</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">About</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:underline" onclick="showPage('about')">Our Story</a></li>
+                        <li><a href="#" class="hover:underline">Sustainability</a></li>
+                        <li><a href="#" class="hover:underline">Press</a></li>
+                        <li><a href="#" class="hover:underline">Careers</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-start mb-2">
+                            <i class="fas fa-map-marker-alt mr-3 mt-1 text-gray-400"></i>
+                            <span>Mersin, Türkiye (Online Store)</span>
+                        </li>
+                        <li class="flex items-start mb-2">
+                            <i class="fas fa-envelope mr-3 mt-1 text-gray-400"></i>
+                            <a href="mailto:Sarahsalahia@gmail.com" class="hover:underline">Sarahsalahia@gmail.com</a>
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-4 flex space-x-4">
+                        <a href="https://www.instagram.com/saromeperfume?igsh=bjVldWttMmo4YTMx&utm_source=qr" target="_blank" class="text-xl hover:text-gray-300 transition"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.tiktok.com/@saromperfume?_t=ZS-8yBkI1sQayD&_r=1" target="_blank" class="text-xl hover:text-gray-300 transition"><i class="fab fa-tiktok"></i></a>
+                        <a href="mailto:Sarahsalahia@gmail.com" class="text-xl hover:text-gray-300 transition"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 Saromé - Online Perfume Store. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Cart functionality
+        let cart = [];
+        let currentModalProduct = null;
+        let currentQuantity = 1;
+        
+        // Page navigation
+        function showPage(pageId) {
+            document.getElementById('home-page').classList.add('hidden');
+            document.getElementById('products-page').classList.add('hidden');
+            document.getElementById('about-page').classList.add('hidden');
+            
+            document.getElementById(pageId + '-page').classList.remove('hidden');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('open');
+        }
+        
+        // Cart toggle
+        function toggleCart() {
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const cartOverlay = document.getElementById('cart-overlay');
+            
+            if (cartSidebar.classList.contains('translate-x-full')) {
+                cartSidebar.classList.remove('translate-x-full');
+                cartOverlay.classList.remove('hidden');
+            } else {
+                cartSidebar.classList.add('translate-x-full');
+                cartOverlay.classList.add('hidden');
+            }
+        }
+        
+        // Add to cart
+        function addToCart(name, price) {
+            const existingItem = cart.find(item => item.name === name);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    name: name,
+                    price: price,
+                    quantity: 1
+                });
+            }
+            
+            updateCart();
+        }
+        
+        // Update cart display
+        function updateCart() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartCountElements = document.querySelectorAll('#cart-count, #mobile-cart-count');
+            let subtotal = 0;
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="text-center py-10">Your bag is empty</p>';
+            } else {
+                cartItemsContainer.innerHTML = '';
+                
+                cart.forEach(item => {
+                    subtotal += item.price * item.quantity;
+                    
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item p-4 border-b border-gray-700';
+                    itemElement.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold">${item.name}</h4>
+                                <p class="text-gray-400 text-sm">$${item.price.toFixed(2)}</p>
+                            </div>
+                            <p class="font-bold">$${(item.price * item.quantity).toFixed(2)}</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-2">
+                            <div class="flex items-center">
+                                <button onclick="updateCartItemQuantity('${item.name}', -1)" class="bg-gray-700 w-6 h-6 flex items-center justify-center text-xs">-</button>
+                                <span class="mx-2">${item.quantity}</span>
+                                <button onclick="updateCartItemQuantity('${item.name}', 1)" class="bg-gray-700 w-6 h-6 flex items-center justify-center text-xs">+</button>
+                            </div>
+                            <button onclick="removeFromCart('${item.name}')" class="text-gray-400 hover:text-white text-sm">Remove</button>
+                        </div>
+                    `;
+                    
+                    cartItemsContainer.appendChild(itemElement);
+                });
+            }
+            
+            // Update cart counts
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCountElements.forEach(el => el.textContent = totalItems);
+            
+            // Update totals
+            document.getElementById('cart-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('cart-total').textContent = `$${subtotal.toFixed(2)}`;
+        }
+        
+        // Update cart item quantity
+        function updateCartItemQuantity(name, change) {
+            const item = cart.find(item => item.name === name);
+            
+            if (item) {
+                item.quantity += change;
+                
+                if (item.quantity <= 0) {
+                    cart = cart.filter(item => item.name !== name);
+                }
+                
+                updateCart();
+            }
+        }
+        
+        // Remove from cart
+        function removeFromCart(name) {
+            cart = cart.filter(item => item.name !== name);
+            updateCart();
+        }
+        
+        // Product modal functions
+        function showProductDetails(name, description, price) {
+            currentModalProduct = { name, description, price };
+            currentQuantity = 1;
+            
+            document.getElementById('modal-product-name').textContent = name;
+            document.getElementById('modal-product-desc').textContent = description;
+            document.getElementById('modal-product-price').textContent = `$${price.toFixed(2)}`;
+            document.getElementById('product-quantity').textContent = currentQuantity;
+            
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+        
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+        
+        function incrementQuantity() {
+            currentQuantity += 1;
+            document.getElementById('product-quantity').textContent = currentQuantity;
+        }
+        
+        function decrementQuantity() {
+            if (currentQuantity > 1) {
+                currentQuantity -= 1;
+                document.getElementById('product-quantity').textContent = currentQuantity;
+            }
+        }
+        
+        function addModalProductToCart() {
+            if (currentModalProduct) {
+                const existingItem = cart.find(item => item.name === currentModalProduct.name);
+                
+                if (existingItem) {
+                    existingItem.quantity += currentQuantity;
+                } else {
+                    cart.push({
+                        name: currentModalProduct.name,
+                        price: currentModalProduct.price,
+                        quantity: currentQuantity
+                    });
+                }
+                
+                updateCart();
+                closeProductModal();
+                
+                // Show a quick notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed bottom-4 right-4 bg-white text-black px-4 py-2 rounded shadow-lg';
+                notification.textContent = `${currentQuantity} ${currentModalProduct.name} added to cart`;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+        
+        // Initialize the home page
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('home');
+        });
+    </script>
+</body>
+</html>
