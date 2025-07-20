@@ -7,21 +7,60 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700&display=swap');
         
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #800020;
-            color: #fff;
+            color: #ffffff;
+            scroll-behavior: smooth;
         }
         
         .heading-font {
             font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+
+        .gold-text {
+            color: #ffffff;
+        }
+
+        .gold-border {
+            border-color: #ffffff;
+        }
+
+        .gold-bg {
+            background-color: #ffffff;
+            color: #800020;
         }
         
+        .product-card {
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transform-style: preserve-3d;
+            transform: perspective(500px) rotateX(0deg) rotateY(0deg);
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-width: 0 15px 15px 0;
+            border-style: solid;
+            border-color: rgba(0,0,0,0.3) rgba(0,0,0,0.3) transparent transparent;
+            transition: all 0.3s ease;
+        }
+
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: perspective(500px) rotateX(5deg) rotateY(-5deg) translateY(-10px);
+            box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .product-card:hover::before {
+            border-width: 0 20px 20px 0;
         }
         
         .cart-item {
@@ -73,18 +112,17 @@
 </head>
 <body class="min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-black bg-opacity-90 text-white sticky top-0 z-50 shadow-lg backdrop-blur-sm">
+    <nav class="bg-black text-white sticky top-0 z-50 shadow-lg backdrop-blur-sm border-b border-gray-800">
         <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-1">
                     <a href="#" class="text-2xl font-bold heading-font tracking-wider" onclick="showPage('home')">SAROMÉ</a>
-                    <span class="text-xs text-gray-400 hidden md:block">LUXURY PERFUMES</span>
+                    <span class="text-xs gold-text hidden md:block">LUXURY PERFUMES</span>
                 </div>
                 
-                <div class="hidden md:flex space-x-8">
-                    <a href="#" class="nav-link px-3 py-2" onclick="showPage('home')">Home</a>
-                    <a href="#" class="nav-link px-3 py-2" onclick="showPage('products')">Perfumes</a>
-                    <a href="#" class="nav-link px-3 py-2" onclick="showPage('about')">Our Story</a>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#" class="nav-link px-3 py-2" onclick="showPage('home')" data-translate="home">Home</a>
+                    <a href="#" class="nav-link px-3 py-2" onclick="showPage('products')" data-translate="perfumes">Perfumes</a>
                     <button onclick="toggleCart()" class="relative px-3 py-2">
                         <i class="fas fa-shopping-bag"></i>
                         <span id="cart-count" class="absolute -top-1 -right-1 bg-white text-black rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
@@ -102,7 +140,6 @@
                 <div class="flex flex-col space-y-2 p-4">
                     <a href="#" class="nav-link py-2" onclick="showPage('home'); toggleMobileMenu()">Home</a>
                     <a href="#" class="nav-link py-2" onclick="showPage('products'); toggleMobileMenu()">Perfumes</a>
-                    <a href="#" class="nav-link py-2" onclick="showPage('about'); toggleMobileMenu()">Our Story</a>
                     <button onclick="toggleCart()" class="relative py-2 text-left flex items-center">
                         <i class="fas fa-shopping-bag mr-2"></i>
                         Shopping Bag
@@ -114,7 +151,7 @@
     </nav>
 
     <!-- Shopping Cart Sidebar -->
-    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full md:w-96 bg-black bg-opacity-90 text-white transform translate-x-full transition-transform duration-300 z-40 overflow-y-auto">
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full md:w-96 bg-black text-white transform translate-x-full transition-transform duration-300 z-40 overflow-y-auto">
         <div class="p-6">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold heading-font">Your Bag</h2>
@@ -152,16 +189,20 @@
     <main class="container mx-auto px-4 py-8">
         <!-- Home Page -->
         <div id="home-page" class="page-transition">
-            <section class="relative h-[90vh] flex items-center justify-center bg-cover bg-center" style="background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1615634262417-94c4e34a63c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');">
-                <div class="text-center px-4">
-                    <h1 class="text-5xl md:text-7xl font-bold heading-font mb-6 tracking-tight">SAROMÉ</h1>
-                    <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-gray-100">Luxury perfumes crafted with passion, designed to evoke emotion and create lasting memories.</p>
-                    <button onclick="showPage('products')" class="bg-white text-black px-8 py-3 font-bold hover:bg-gray-200 transition duration-300 transform hover:scale-105">
-                        Discover Our Scents <i class="fas fa-arrow-right ml-2"></i>
+            <section class="relative h-screen flex items-center justify-center overflow-hidden">
+                <div class="absolute inset-0 bg-black bg-opacity-70 z-10"></div>
+                <video autoplay muted loop class="absolute inset-0 w-full h-full object-cover">
+                    <source src="https://assets.mixkit.co/videos/preview/mixkit-perfume-bottle-on-a-table-39829-large.mp4" type="video/mp4">
+                </video>
+                <div class="text-center px-4 relative z-20">
+                    <h1 class="text-5xl md:text-8xl font-bold heading-font mb-6 tracking-tighter gold-text">SAROMÉ</h1>
+                    <p class="text-xl md:text-3xl mb-8 max-w-3xl mx-auto gold-text leading-relaxed">Exquisite fragrances crafted with rare ingredients, embodying timeless elegance and sophistication.</p>
+                    <button onclick="showPage('products')" class="gold-bg text-black px-10 py-4 font-bold hover:bg-opacity-90 transition-all duration-300 transform hover:scale-105 uppercase tracking-wider text-sm">
+                        Discover Our Collection <i class="fas fa-arrow-right ml-3 transition-transform group-hover:translate-x-1"></i>
                     </button>
                 </div>
                 <div class="absolute bottom-8 left-0 right-0 flex justify-center">
-                    <a href="#signature-collection" class="text-white animate-bounce">
+                    <a href="#signature-collection" class="gold-text animate-bounce">
                         <i class="fas fa-chevron-down text-2xl"></i>
                     </a>
                 </div>
@@ -170,15 +211,15 @@
             <section class="py-16">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl font-bold heading-font mb-4">Our Signature Collection</h2>
-                    <p class="max-w-2xl mx-auto">Experience our most beloved fragrances that have captivated customers worldwide.</p>
+                    <p class="max-w-2xl mx-auto gold-text">Experience our most beloved fragrances that have captivated customers worldwide.</p>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition-all duration-300 cursor-pointer hover:bg-opacity-70 group" onclick="showProductDetails('Noir', 'A deep, mysterious blend of oud, vanilla, and amber', 120)">
-                        <div class="h-64 bg-gradient-to-b from-gray-900 to-gray-800 mb-4 flex items-center justify-center rounded-t-lg overflow-hidden">
-                            <i class="fas fa-wine-bottle text-6xl text-gray-500 group-hover:text-gray-300 transition"></i>
+                    <div class="product-card bg-[#600018] p-6 rounded-lg transition-all duration-300 cursor-pointer hover:bg-opacity-90 group relative overflow-hidden" onclick="showProductDetails('SARAH', 'A deep, mysterious blend of oud, vanilla, and amber', 120)">
+                        <div class="h-96 bg-gray-800 mb-4 flex items-center justify-center rounded-t-lg overflow-hidden">
+                            <img src="WhatsApp Image 2025-07-20 at 21.44.34.jpeg" alt="SARAH perfume" class="h-full w-full object-cover">
                         </div>
-                        <h3 class="text-xl font-bold heading-font mb-2">Noir</h3>
+                        <h3 class="text-xl font-bold heading-font mb-2">SARAH</h3>
                         <p class="text-gray-300 mb-4 text-sm">Mysterious • Seductive • Powerful</p>
                         <div class="flex justify-between items-center">
                             <p class="font-bold">$120.00</p>
@@ -188,18 +229,18 @@
                         </div>
                     </div>
                     
-                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition cursor-pointer" onclick="showProductDetails('Blanc', 'A fresh, clean scent with notes of citrus and white flowers', 95)">
-                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
-                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                    <div class="product-card bg-[#600018] p-6 rounded-lg transition cursor-pointer relative overflow-hidden" onclick="showProductDetails('Blanc', 'A fresh, clean scent with notes of citrus and white flowers', 95)">
+                        <div class="h-96 bg-gray-800 mb-4 flex items-center justify-center rounded-t-lg overflow-hidden">
+                            <img src="WhatsApp Image 2025-07-20 at 21.44.34 (1).jpeg" alt="Blanc Perfume" class="h-full w-full object-cover">
                         </div>
                         <h3 class="text-xl font-bold heading-font mb-2">Blanc</h3>
                         <p class="text-gray-300 mb-4">Fresh • Clean • Elegant</p>
                         <p class="font-bold">$95.00</p>
                     </div>
                     
-                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition cursor-pointer" onclick="showProductDetails('Rouge', 'A passionate blend of rose, saffron, and warm spices', 110)">
-                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
-                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                    <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition cursor-pointer relative overflow-hidden" onclick="showProductDetails('Rouge', 'A passionate blend of rose, saffron, and warm spices', 110)">
+                        <div class="h-96 bg-gray-800 mb-4 flex items-center justify-center overflow-hidden">
+                            <img src="WhatsApp Image 2025-07-20 at 21.44.34 (1).jpeg" alt="Rouge Perfume" class="h-full w-full object-cover">
                         </div>
                         <h3 class="text-xl font-bold heading-font mb-2">Rouge</h3>
                         <p class="text-gray-300 mb-4">Passionate • Warm • Romantic</p>
@@ -221,10 +262,10 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- Product 1 -->
                     <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
-                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
-                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        <div class="h-96 bg-gray-800 mb-4 flex items-center justify-center overflow-hidden">
+                            <img src="WhatsApp Image 2025-07-20 at 21.44.34.jpeg" class="h-full w-full object-cover">
                         </div>
-                        <h3 class="text-xl font-bold heading-font mb-2">Noir</h3>
+                        <h3 class="text-xl font-bold heading-font mb-2">SARAH</h3>
                         <p class="text-gray-300 mb-4">A deep, mysterious blend of oud, vanilla, and amber</p>
                         <div class="flex justify-between items-center">
                             <p class="font-bold">$120.00</p>
@@ -234,8 +275,8 @@
                     
                     <!-- Product 2 -->
                     <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
-                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
-                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        <div class="h-96 bg-gray-800 mb-4 flex items-center justify-center rounded-t-lg overflow-hidden">
+                            <img src="WhatsApp Image 2025-07-20 at 21.44.34 (1).jpeg" alt="Soleil Perfume" class="h-full w-full object-cover">
                         </div>
                         <h3 class="text-xl font-bold heading-font mb-2">Blanc</h3>
                         <p class="text-gray-300 mb-4">A fresh, clean scent with notes of citrus and white flowers</p>
@@ -247,8 +288,8 @@
                     
                     <!-- Product 3 -->
                     <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
-                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
-                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        <div class="h-96 bg-gray-800 mb-4 flex items-center justify-center rounded-t-lg overflow-hidden">
+                            <img src="WhatsApp Image 2025-07-20 at 21.44.34 (1).jpeg" alt="Éclat Perfume" class="h-full w-full object-cover">
                         </div>
                         <h3 class="text-xl font-bold heading-font mb-2">Rouge</h3>
                         <p class="text-gray-300 mb-4">A passionate blend of rose, saffron, and warm spices</p>
@@ -260,8 +301,8 @@
                     
                     <!-- Product 4 -->
                     <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
-                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
-                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        <div class="h-96 bg-gray-800 mb-4 flex items-center justify-center rounded-t-lg overflow-hidden">
+                            <img src="WhatsApp Image 2025-07-20 at 21.44.34 (1).jpeg" alt="Lune Perfume" class="h-full w-full object-cover">
                         </div>
                         <h3 class="text-xl font-bold heading-font mb-2">Lune</h3>
                         <p class="text-gray-300 mb-4">A nocturnal fragrance with jasmine, sandalwood, and musk</p>
@@ -273,8 +314,8 @@
                     
                     <!-- Product 5 -->
                     <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
-                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
-                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        <div class="h-96 bg-gray-800 mb-4 flex items-center justify-center rounded-t-lg overflow-hidden">
+                            <img src="WhatsApp Image 2025-07-20 at 21.44.34 (1).jpeg" alt="Lune Perfume" class="h-full w-full object-cover">
                         </div>
                         <h3 class="text-xl font-bold heading-font mb-2">Soleil</h3>
                         <p class="text-gray-300 mb-4">A sunny, vibrant scent with bergamot, neroli, and amber</p>
@@ -286,64 +327,14 @@
                     
                     <!-- Product 6 -->
                     <div class="product-card bg-black bg-opacity-50 p-6 rounded-lg transition">
-                        <div class="h-64 bg-gray-800 mb-4 flex items-center justify-center">
-                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        <div class="h-96 bg-gray-800 mb-4 flex items-center justify-center rounded-t-lg overflow-hidden">
+                            <img src="WhatsApp Image 2025-07-20 at 21.44.34 (1).jpeg" alt="Éclat Perfume" class="h-full w-full object-cover">
                         </div>
                         <h3 class="text-xl font-bold heading-font mb-2">Éclat</h3>
                         <p class="text-gray-300 mb-4">A sparkling fragrance with pear, peony, and cedarwood</p>
                         <div class="flex justify-between items-center">
                             <p class="font-bold">$115.00</p>
                             <button onclick="addToCart('Éclat', 115)" class="bg-white text-black px-4 py-2 text-sm font-bold hover:bg-gray-200 transition">Add to Bag</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- About Page -->
-        <div id="about-page" class="page-transition hidden">
-            <section class="py-8">
-                <div class="flex flex-col md:flex-row items-center mb-12">
-                    <div class="md:w-1/2 mb-8 md:mb-0 md:pr-8">
-                        <h1 class="text-3xl md:text-4xl font-bold heading-font mb-6">Our Story</h1>
-                        <p class="mb-4">Sarah Salahia's journey with Saromé began with love and curiosity. What started small, as a personal exploration of scents and emotions, blossomed into a passion for bottling feelings into fragrances.</p>
-                        <p class="mb-4">"I created Saromé to share my vision of perfumery as an art form. Each scent is carefully composed like a symphony, with top notes that greet you, heart notes that reveal the character, and base notes that linger in memory."</p>
-                        <p>Today, Saromé perfumes are cherished by those who seek more than just a scent - they seek a bottled emotion, a memory, a moment captured in fragrance.</p>
-                    </div>
-                    <div class="md:w-1/2">
-                        <div class="h-96 bg-gray-800 bg-opacity-50 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-store text-6xl text-gray-600"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex flex-col md:flex-row-reverse items-center mb-12">
-                    <div class="md:w-1/2 mb-8 md:mb-0 md:pl-8">
-                        <h2 class="text-2xl md:text-3xl font-bold heading-font mb-6">Our Philosophy</h2>
-                        <p class="mb-4">At Saromé, we believe that a fragrance should be more than just a pleasant scent—it should be an experience, a memory, a statement.</p>
-                        <p class="mb-4">We use only the finest ingredients sourced from ethical suppliers around the world. Each perfume is crafted in small batches to ensure quality and attention to detail.</p>
-                        <p>Our perfumes are designed to evolve with you throughout the day, revealing different notes as time passes, just like a beautiful story unfolding.</p>
-                    </div>
-                    <div class="md:w-1/2">
-                        <div class="h-96 bg-gray-800 bg-opacity-50 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-mortar-pestle text-6xl text-gray-600"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-black bg-opacity-50 p-8 rounded-lg">
-                    <h2 class="text-2xl md:text-3xl font-bold heading-font mb-6 text-center">Meet the Founder</h2>
-                    <div class="flex flex-col md:flex-row items-center">
-                        <div class="md:w-1/3 mb-6 md:mb-0 flex justify-center">
-                            <div class="w-48 h-48 bg-gray-800 rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-6xl text-gray-600"></i>
-                            </div>
-                        </div>
-                        <div class="md:w-2/3 md:pl-8">
-                            <h3 class="text-xl font-bold heading-font mb-2">Sarah Salahia</h3>
-                            <p class="text-gray-300 mb-4">Founder & Perfume Creator</p>
-                            <p class="mb-4">"I started small, with love and curiosity. Now, I bottle feelings into fragrances. Each Saromé scent is a journey - from the first spark of inspiration to the final blend that captures an emotion perfectly."</p>
-                            <p>Sarah's approach to perfumery comes from the heart, blending techniques with personal intuition. Each fragrance tells a story, evokes a memory, or captures a feeling - because to Sarah, perfume is emotion made tangible.</p>
                         </div>
                     </div>
                 </div>
@@ -357,8 +348,8 @@
                 
                 <div class="flex flex-col md:flex-row">
                     <div class="md:w-1/2 mb-6 md:mb-0 md:pr-6">
-                        <div class="h-64 bg-gray-800 flex items-center justify-center">
-                            <i class="fas fa-wine-bottle text-6xl text-gray-600"></i>
+                        <div class="h-96 bg-gray-800 flex items-center justify-center overflow-hidden rounded-t-lg">
+                            <img src="https://images.unsplash.com/photo-1615634262417-94c4e34a63c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Perfume" class="h-full w-full object-cover">
                         </div>
                     </div>
                     <div class="md:w-1/2">
@@ -379,13 +370,32 @@
         </div>
     </main>
 
+    <!-- Newsletter -->
+    <section class="py-16 bg-black border-t border-b border-gray-800">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <div class="text-center mb-8">
+                <h3 class="text-2xl font-bold heading-font mb-2">Join Our World</h3>
+                <p class="gold-text max-w-xl mx-auto">Subscribe to receive exclusive offers, fragrance insights, and early access to new collections.</p>
+            </div>
+            <form class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+                <input type="email" placeholder="Your email address" class="flex-grow px-4 py-3 bg-gray-900 border border-gray-700 focus:border-gold-500 focus:outline-none rounded-sm">
+                <button type="submit" class="gold-bg text-black px-6 py-3 font-bold hover:bg-opacity-90 transition uppercase tracking-wider text-sm">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
     <!-- Footer -->
-    <footer class="bg-black bg-opacity-90 text-white py-12">
+    <footer class="bg-black text-white py-16 border-t border-gray-800">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
                 <div>
-                    <h3 class="text-xl font-bold heading-font mb-4">Saromé</h3>
-                    <p>Luxury perfumes crafted with passion in Mersin, Türkiye. Online store delivering worldwide.</p>
+                    <h3 class="text-xl font-bold heading-font mb-6 gold-text">Saromé</h3>
+                    <p class="gold-text mb-4">The essence of luxury, crafted with uncompromising excellence.</p>
+                    <div class="flex space-x-4">
+                        <img src="https://via.placeholder.com/80x50?text=Mastercard" alt="Mastercard" class="h-8 opacity-70">
+                        <img src="https://via.placeholder.com/80x50?text=Visa" alt="Visa" class="h-8 opacity-70">
+                        <img src="https://via.placeholder.com/80x50?text=Amex" alt="Amex" class="h-8 opacity-70">
+                    </div>
                 </div>
                 
                 <div>
@@ -395,16 +405,6 @@
                         <li><a href="#" class="hover:underline" onclick="showPage('products')">Best Sellers</a></li>
                         <li><a href="#" class="hover:underline" onclick="showPage('products')">New Arrivals</a></li>
                         <li><a href="#" class="hover:underline" onclick="toggleCart()">Your Cart</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="font-bold mb-4">About</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="hover:underline" onclick="showPage('about')">Our Story</a></li>
-                        <li><a href="#" class="hover:underline">Sustainability</a></li>
-                        <li><a href="#" class="hover:underline">Press</a></li>
-                        <li><a href="#" class="hover:underline">Careers</a></li>
                     </ul>
                 </div>
                 
@@ -429,8 +429,16 @@
                 </div>
             </div>
             
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2023 Saromé - Online Perfume Store. All rights reserved.</p>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500">
+                <div class="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6">
+                    <p>&copy; 2023 Saromé Maison de Parfum. All rights reserved.</p>
+                    <div class="hidden md:block h-4 w-px bg-gray-700"></div>
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-gray-300">Privacy Policy</a>
+                        <a href="#" class="hover:text-gray-300">Terms of Service</a>
+                        <a href="#" class="hover:text-gray-300">Shipping Policy</a>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>
@@ -445,7 +453,6 @@
         function showPage(pageId) {
             document.getElementById('home-page').classList.add('hidden');
             document.getElementById('products-page').classList.add('hidden');
-            document.getElementById('about-page').classList.add('hidden');
             
             document.getElementById(pageId + '-page').classList.remove('hidden');
             
